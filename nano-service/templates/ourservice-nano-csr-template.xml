@@ -1,0 +1,18 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint="ourservice-nano-servicepoint"
+                 componenttype="ncs:self"
+                 state="ourservice-nano:vm-run">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{$VNF}</name>
+      <config>
+        <snmp-server xmlns="urn:ios">
+          <community>
+            <name>public</name>
+            <RO/>
+          </community>
+        </snmp-server>
+      </config>
+    </device>
+  </devices>
+</config-template>

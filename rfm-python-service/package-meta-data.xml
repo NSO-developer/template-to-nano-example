@@ -1,0 +1,15 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>ourservice-python</name>
+  <package-version>1.0</package-version>
+  <description>Generated Python package</description>
+  <ncs-min-version>5.3</ncs-min-version>
+  <required-package>
+    <name>cisco-etsi-nfvo</name>
+  </required-package>
+  <component>
+    <name>main</name>
+    <application>
+      <python-class-name>ourservice_python.main.Main</python-class-name>
+    </application>
+  </component>
+</ncs-package>

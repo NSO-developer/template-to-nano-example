@@ -1,0 +1,73 @@
+module ourservice-python {
+  namespace "http://example.com/ourservice-python";
+  prefix ourservice-python;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  description
+    "Bla bla...";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  identity allocation {
+    base ncs:plan-state;
+  }
+  identity vm-run {
+    base ncs:plan-state;
+  }
+  identity vm-config {
+    base ncs:plan-state;
+  }
+
+  list ourservice-python {
+    description "This is an RFS skeleton service";
+    key name;
+    uses ncs:service-data;
+    uses ncs:plan-data;
+    ncs:servicepoint ourservice-python-servicepoint;
+
+    leaf name {
+      type string;
+    }
+
+    leaf allocation {
+      type string;
+    }
+
+    container operdata {
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+      list GigabitEthernet {
+        key id;
+        leaf id {
+          type int32;
+        }
+        leaf address {
+          type inet:ip-address;
+        }
+        leaf mac {
+          type yang:mac-address;
+        }
+        leaf gateway {
+          type inet:ip-address;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <?set VNF = {concat(name, '-','csr')}?>
+  <kickers xmlns="http://tail-f.com/ns/kicker">
+    <data-kicker>
+      <id>ourservice-python-{name}</id>
+      <monitor>/nfv/cisco-nfvo:vnf-info-plan[name='{$VNF}']/plan/component[type='ncs:self'][name='self']/state[name='ncs:ready']</monitor>
+      <trigger-expr>status = 'reached'</trigger-expr>
+      <kick-node>/ourservice-python[name='{name}']</kick-node>
+      <action-name>reactive-re-deploy</action-name>
+    </data-kicker>
+  </kickers>
+</config-template>

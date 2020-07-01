@@ -1,0 +1,98 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint="ourservice-rfm-template">
+  <?set VNF = {concat(name, '-','csr')}?>
+
+<!-- Step 1,2 and 7 are not done in this template service -->
+<!-- 1 Create initial PLAN states for our service -->
+<!-- 2 Create allocation (why cant we do this here?) -->
+<!-- 3 Wait for allocation to be ready -->
+  <?if {not(../nfv:nfv/cisco-nfvo-ro:resource-orchestration/allocation[id=current()/allocation]/response/ok)}?>
+  <kickers xmlns="http://tail-f.com/ns/kicker">
+    <data-kicker>
+      <id>ourservice-ro-{allocation}</id>
+      <monitor>/nfv:nfv/cisco-nfvo-ro:resource-orchestration/allocation[id='{allocation}']/response/ok</monitor>
+      <kick-node>/ourservice[name='{name}']</kick-node>
+      <action-name>reactive-re-deploy</action-name>
+    </data-kicker>
+  </kickers>
+<!-- 4 Get allocation response data and use it to instantiate a VNF-INFO -->
+  <?else?>
+  <?save-context service?>
+  <?set-root-node {/nfv:nfv/cisco-nfvo-ro:resource-orchestration}?>
+  <?set VNFM = {/allocation[id=current()/allocation]/response/ok/vdu[vnf-profile-id='none'][vnfd-id='CSR1kv'][vdu-id='CSR']/virtual-compute/vnfm}?>
+  <?set HOST = {/allocation[id=current()/allocation]/response/ok/vdu[vnf-profile-id='none'][vnfd-id='CSR1kv'][vdu-id='CSR']/virtual-compute/hostname}?>
+  <?switch-context service?>
+  <nfv xmlns="urn:etsi:nfv:yang:etsi-nfv-descriptors">
+    <vnf-info xmlns="http://cisco.com/ns/nso/cfp/cisco-etsi-nfvo">
+      <name>{$VNF}</name>
+      <username>admin</username>
+      <vnfd>CSR1kv</vnfd>
+      <vnfd-flavour>basic</vnfd-flavour>
+      <instantiation-level>basic</instantiation-level>
+      <vnfm>{$VNFM}</vnfm>
+      <vnfm-type>netconf</vnfm-type>
+      <vim-type>openstack</vim-type>
+      <tenant>saab</tenant>
+      <vdu>
+        <id>CSR</id>
+        <device-name-pool>
+          <device-name>{$VNF}</device-name>
+        </device-name-pool>
+        <managed/>
+        <image-name>CSR1Kv-16.08.01a</image-name>
+        <flavour-name>csr-flavor</flavour-name>
+        <bootup-time>600</bootup-time>
+        <recovery-wait-time>600</recovery-wait-time>
+        <resource-allocation>
+          <host-placement>{$HOST}</host-placement>
+        </resource-allocation>
+        <artifact>
+          <id>test</id>
+          <url>http://10.24.63.237:4545/CSR-kn-day0.txt</url>
+        </artifact>
+        <authgroup>csr</authgroup>
+      </vdu>
+      <vnfd-connection-point>
+        <id>left</id>
+        <network-name>left</network-name>
+      </vnfd-connection-point>
+      <vnfd-connection-point>
+        <id>mgmt</id>
+        <network-name>flat-provider-network</network-name>
+      </vnfd-connection-point>
+    </vnf-info>
+  </nfv>
+  <?end?>
+
+<!-- 5 Wait for the VNF to be up and running -->
+  <?if {not(../nfv:nfv/cisco-nfvo:vnf-info-plan[name=$VNF]/plan/component[type='ncs:self'][name='self']/state[name='ncs:ready']/status = 'reached')}?>
+  <kickers xmlns="http://tail-f.com/ns/kicker">
+    <data-kicker>
+      <id>ourservice-{name}</id>
+      <monitor>/nfv/cisco-nfvo:vnf-info-plan[name='{$VNF}']/plan/component[type='ncs:self'][name='self']/state[name='ncs:ready']</monitor>
+      <trigger-expr>status = 'reached'</trigger-expr>
+      <kick-node>/ourservice[name='{name}']</kick-node>
+      <action-name>reactive-re-deploy</action-name>
+    </data-kicker>
+  </kickers>
+  <?else?>
+
+<!-- 6 Configure the device and update our PLAN that the device is -->
+<!--   up and configured -->
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{$VNF}</name>
+      <config>
+        <snmp-server xmlns="urn:ios">
+          <community>
+            <name>public</name>
+            <RO/>
+          </community>
+        </snmp-server>
+      </config>
+    </device>
+  </devices>
+  <?end?>
+
+<!-- 7 Fetch some operational data from the device and store it in our service -->
+</config-template>

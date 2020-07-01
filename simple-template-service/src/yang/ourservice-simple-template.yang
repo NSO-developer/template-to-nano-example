@@ -1,0 +1,21 @@
+module ourservice-simple-template {
+  namespace "http://com/example/ourservice-simple-template";
+  prefix simple-template;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  list ourservice-simple-template {
+    key name;
+
+    uses ncs:service-data;
+    ncs:servicepoint "ourservice-simple-template";
+    leaf name {
+      type string;
+    }
+  }
+}

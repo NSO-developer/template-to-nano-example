@@ -1,0 +1,6 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>ourservice-rfm-template</name>
+  <package-version>1.0</package-version>
+  <description>Template-based ourservice resource facing service</description>
+  <ncs-min-version>5.3</ncs-min-version>
+</ncs-package>

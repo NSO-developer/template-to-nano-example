@@ -1,0 +1,42 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <nfv xmlns="urn:etsi:nfv:yang:etsi-nfv-descriptors">
+    <vnf-info xmlns="http://cisco.com/ns/nso/cfp/cisco-etsi-nfvo">
+      <name>csr</name>
+      <tenant>saab</tenant>
+      <username>admin</username>
+      <vnfd>CSR1kv</vnfd>
+      <vnfd-flavour>basic</vnfd-flavour>
+      <instantiation-level>basic</instantiation-level>
+      <vnfm>esc0</vnfm>
+      <vnfm-type>netconf</vnfm-type>
+      <vim-type>openstack</vim-type>
+      <vdu>
+        <id>CSR</id>
+        <device-name-pool>
+          <device-name>csr</device-name>
+        </device-name-pool>
+        <managed/>
+        <image-name>CSR1Kv-16.08.01a</image-name>
+        <flavour-name>csr-flavor</flavour-name>
+        <bootup-time>600</bootup-time>
+        <recovery-wait-time>600</recovery-wait-time>
+        <resource-allocation>
+          <host-placement>micro-aio-2</host-placement>
+        </resource-allocation>
+        <artifact>
+          <id>test</id>
+          <url>http://10.24.63.237:4545/CSR-kn-day0.txt</url>
+        </artifact>
+        <authgroup>csr</authgroup>
+      </vdu>
+      <vnfd-connection-point>
+        <id>left</id>
+        <network-name>left</network-name>
+      </vnfd-connection-point>
+      <vnfd-connection-point>
+        <id>mgmt</id>
+        <network-name>flat-provider-network</network-name>
+      </vnfd-connection-point>
+    </vnf-info>
+  </nfv>
+</config>

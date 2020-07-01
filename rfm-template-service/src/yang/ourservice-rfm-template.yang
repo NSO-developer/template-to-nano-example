@@ -1,0 +1,26 @@
+module ourservice-rfm-template {
+  namespace "http://com/example/ourservice-rfm-template";
+  prefix rfm-template;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  list ourservice-rfm-template {
+    key name;
+
+    uses ncs:service-data;
+    ncs:servicepoint "ourservice-rfm-template";
+
+    leaf name {
+      type string;
+    }
+
+    leaf allocation {
+      type string;
+    }
+  }
+}

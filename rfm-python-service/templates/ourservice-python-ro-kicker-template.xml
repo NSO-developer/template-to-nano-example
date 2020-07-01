@@ -1,0 +1,10 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <kickers xmlns="http://tail-f.com/ns/kicker">
+    <data-kicker>
+      <id>ourservice-python-ro-{allocation}</id>
+      <monitor>/nfv:nfv/cisco-nfvo-ro:resource-orchestration/allocation[id='{allocation}']/response/ok</monitor>
+      <kick-node>/ourservice-python[name='{name}']</kick-node>
+      <action-name>reactive-re-deploy</action-name>
+    </data-kicker>
+  </kickers>
+</config-template>

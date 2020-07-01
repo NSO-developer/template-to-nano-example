@@ -1,0 +1,140 @@
+module ourservice-nano {
+  namespace "http://example.com/ourservice-nano";
+  prefix ourservice-nano;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import cisco-etsi-nfvo {
+    prefix cisco-nfvo;
+  }
+  import cisco-etsi-nfvo-ro {
+    prefix cisco-nfvo-ro;
+  }
+  import etsi-nfv-descriptors {
+    prefix nfv;
+  }
+
+  description
+    "Bla bla...";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  identity allocation {
+    base ncs:plan-state;
+  }
+  identity vm-run {
+    base ncs:plan-state;
+  }
+  identity vm-config {
+    base ncs:plan-state;
+  }
+
+  // # 1 Create initial PLAN states for our service
+  ncs:plan-outline ourservice-nano-plan {
+    ncs:component-type "ncs:self" {
+      ncs:state "ncs:init" {
+  // # 2 Create allocation
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+  // # 3 Wait for allocation to be ready
+      ncs:state  "ourservice-nano:allocation" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor "/nfv:nfv/cisco-nfvo-ro:resource-orchestration/allocation[id=$ALLOCATION]/response/ok";
+          }
+  // # 4 Get allocation response data and use it to instantiate a VNF-INFO
+          ncs:nano-callback;
+        }
+      }
+  // # 5 Wait for the VNF to be up and running
+      ncs:state  "ourservice-nano:vm-run" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor "/nfv:nfv/cisco-nfvo:vnf-info-plan[name=$VNF]/plan/component[type='ncs:self'][name='self']/state[name='ncs:ready']" {
+              ncs:trigger-expr "status = 'reached'";
+            }
+          }
+  // # 6 Configure the device and update our PLAN that the device is
+  // # up and configured
+          ncs:nano-callback;
+        }
+      }
+  // # 7 Fetch some operational data from the device and store it in our service
+      ncs:state  "ourservice-nano:vm-config" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+  // Mark service ready.
+      ncs:state "ncs:ready";
+    }
+  }
+
+  ncs:service-behavior-tree ourservice-nano-servicepoint {
+    ncs:plan-outline-ref "ourservice-nano-plan";
+    ncs:selector {
+      ncs:variable "ALLOCATION" {
+        ncs:value-expr "$SERVICE/allocation";
+      }
+      ncs:variable "VNF" {
+        ncs:value-expr "concat($SERVICE/name,'-','csr')";
+      }
+      ncs:create-component "'self'" {
+        ncs:component-type-ref "ncs:self";
+      }
+    }
+  }
+
+  list ourservice-nano {
+    description "This is an RFS skeleton service";
+    key name;
+    uses ncs:service-data;
+    uses ncs:nano-plan-data;
+    ncs:servicepoint ourservice-nano-servicepoint;
+
+    leaf name {
+      type string;
+    }
+
+    leaf allocation {
+      type string;
+    }
+
+    container operdata {
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+      list GigabitEthernet {
+        key id;
+        leaf id {
+          type int8;
+        }
+        leaf address {
+          type inet:ip-address;
+        }
+        leaf mac {
+          type yang:mac-address;
+        }
+        leaf gateway {
+          type inet:ip-address;
+        }
+      }
+    }
+  }
+}

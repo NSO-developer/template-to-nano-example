@@ -1,0 +1,17 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <nfv xmlns="urn:etsi:nfv:yang:etsi-nfv-descriptors">
+    <resource-orchestration
+        xmlns="http://cisco.com/ns/nso/cfp/cisco-etsi-nfvo-ro">
+      <allocation>
+        <id>{allocation}</id>
+        <request>
+          <vnf>
+            <vnfd>CSR1kv</vnfd>
+            <deployment-flavour>basic</deployment-flavour>
+            <instantiation-level>basic</instantiation-level>
+          </vnf>
+        </request>
+      </allocation>
+    </resource-orchestration>
+  </nfv>
+</config-template>

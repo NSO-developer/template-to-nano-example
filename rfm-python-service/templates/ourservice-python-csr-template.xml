@@ -1,0 +1,15 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{$VNF}</name>
+      <config>
+        <snmp-server xmlns="urn:ios">
+          <community>
+            <name>public</name>
+            <RO/>
+          </community>
+        </snmp-server>
+      </config>
+    </device>
+  </devices>
+</config-template>
